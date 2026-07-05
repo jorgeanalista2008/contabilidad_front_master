@@ -7,6 +7,9 @@ import { useRouter } from 'next/router'
 // ** Axios
 import axios from 'axios'
 
+// Configure Axios base URL
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+
 // ** Config
 import authConfig from 'src/configs/auth'
 
@@ -45,12 +48,12 @@ const AuthProvider = ({ children }: Props) => {
         await axios
           .get(authConfig.meEndpoint, {
             headers: {
-              Authorization: storedToken
+              Authorization: `Bearer ${storedToken}`
             }
           })
           .then(async response => {
             setLoading(false)
-            setUser({ ...response.data.userData })
+            setUser({ ...response.data.user })
           })
           .catch(() => {
             localStorage.removeItem('userData')
@@ -80,8 +83,8 @@ const AuthProvider = ({ children }: Props) => {
           : null
         const returnUrl = router.query.returnUrl
 
-        setUser({ ...response.data.userData })
-        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.userData)) : null
+        setUser({ ...response.data.user })
+        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.user)) : null
 
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
 
