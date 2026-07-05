@@ -75,8 +75,9 @@ const AuthProvider = ({ children }: Props) => {
   }, [])
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
+    const { rememberMe, ...loginData } = params
     axios
-      .post(authConfig.loginEndpoint, params)
+      .post(authConfig.loginEndpoint, loginData)
       .then(async response => {
         params.rememberMe
           ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
