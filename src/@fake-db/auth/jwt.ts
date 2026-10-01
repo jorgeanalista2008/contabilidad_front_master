@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import mock from 'src/@fake-db/mock'
 
 // ** Default AuthConfig
-import defaultAuthConfig from 'src/configs/auth'
+// import defaultAuthConfig from 'src/configs/auth'
 
 // ** Types
 import { UserDataType } from 'src/context/types'
@@ -36,7 +36,7 @@ const jwtConfig = {
   refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET
 }
 
-type ResponseType = [number, { [key: string]: any }]
+// type ResponseType = [number, { [key: string]: any }]
 
 mock.onPost('/jwt/login').reply(request => {
   const { email, password } = JSON.parse(request.data)

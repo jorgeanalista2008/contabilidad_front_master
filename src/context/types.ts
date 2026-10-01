@@ -14,7 +14,9 @@ export type UserDataType = {
   username: string
   password: string
   avatar?: string | null
+  isSuperAdmin?: boolean
 }
+
 
 export type AuthValuesType = {
   loading: boolean

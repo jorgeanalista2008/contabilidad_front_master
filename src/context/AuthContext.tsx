@@ -4,14 +4,12 @@ import { createContext, useEffect, useState, ReactNode } from 'react'
 // ** Next Import
 import { useRouter } from 'next/router'
 
-// ** Axios
-import axios from 'axios'
-
-// Configure Axios base URL
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
+// ** API Config
+import api from 'src/configs/api'
 
 // ** Config
 import authConfig from 'src/configs/auth'
+
 
 // ** Types
 import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
@@ -32,6 +30,23 @@ type Props = {
   children: ReactNode
 }
 
+const decodeJwt = (token: string) => {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    return null
+  }
+}
+
 const AuthProvider = ({ children }: Props) => {
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
@@ -45,15 +60,17 @@ const AuthProvider = ({ children }: Props) => {
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
       if (storedToken) {
         setLoading(true)
-        await axios
+        await api
           .get(authConfig.meEndpoint, {
             headers: {
               Authorization: `Bearer ${storedToken}`
             }
           })
           .then(async response => {
+            const decoded = decodeJwt(storedToken)
+            const isSuperAdmin = decoded?.is_super_admin === true
             setLoading(false)
-            setUser({ ...response.data.user })
+            setUser({ ...response.data.user, isSuperAdmin })
           })
           .catch(() => {
             localStorage.removeItem('userData')
@@ -75,27 +92,33 @@ const AuthProvider = ({ children }: Props) => {
   }, [])
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
-    const { rememberMe, ...loginData } = params
-    axios
+    const loginData = { ...params }
+    delete (loginData as any).rememberMe
+    api
       .post(authConfig.loginEndpoint, loginData)
       .then(async response => {
+        const token = response.data.accessToken
         params.rememberMe
-          ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.accessToken)
+          ? window.localStorage.setItem(authConfig.storageTokenKeyName, token)
           : null
         const returnUrl = router.query.returnUrl
 
-        setUser({ ...response.data.user })
-        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.user)) : null
+        const decoded = decodeJwt(token)
+        const isSuperAdmin = decoded?.is_super_admin === true
+        const userData = { ...response.data.user, isSuperAdmin }
+
+        setUser(userData)
+        params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(userData)) : null
 
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
 
         router.replace(redirectURL as string)
       })
-
       .catch(err => {
         if (errorCallback) errorCallback(err)
       })
   }
+
 
   const handleLogout = () => {
     setUser(null)

@@ -126,7 +126,7 @@ const App = (props: ExtendedAppProps) => {
             name='description'
             content={`${themeConfig.templateName} – Software administrativo – `}
           />
-          <meta name='keywords' content='Aurora ver 1.0 , crm' />
+          <meta name='keywords' content='SaaS Contable ver 1.0, contabilidad, seniat' />
           <meta name='viewport' content='initial-scale=1, width=device-width' />
         </Head>
 

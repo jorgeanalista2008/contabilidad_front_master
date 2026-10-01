@@ -39,6 +39,7 @@ export type NavSectionTitle = {
 }
 
 export type NavGroup = {
+
   // JORGE FLORES
   id?: string
   name?: string

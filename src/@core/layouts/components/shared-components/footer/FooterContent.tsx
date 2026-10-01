@@ -1,5 +1,6 @@
 // ** Next Import
 import Link from 'next/link'
+
 // JORGE FLORES
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -26,7 +27,7 @@ const FooterContent = () => {
         </Box>
         {` by `}
         <LinkStyled target='_blank' href='#'>
-          Aurora ver 1.0
+          SaaS Contable ver 1.0
         </LinkStyled>
       </Typography>
       {hidden ? null : (

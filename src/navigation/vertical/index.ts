@@ -5,7 +5,7 @@ const navigation = (): VerticalNavItemsType => {
 
   return [
     {
-      title: 'Aurora',
+      title: 'SaaS Contable',
       icon: 'mdi:unfold-more-vertical',
     
       children: [
